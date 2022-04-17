@@ -1,2 +1,8 @@
 # PE
-Programmable Exploration
+> Programmable Exploration
+
+**outline**  
+
+- [ ] cc-sample  
+- [ ] cc-tool 
+
