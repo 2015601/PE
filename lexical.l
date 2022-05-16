@@ -25,11 +25,13 @@
 <INITIAL>"{"	return LB;
 <INITIAL>"}"	return RB;
 
-/* constant */
-<INITIAL>[0-9]+	{ }
+<INITIAL>[0-9]+	{ 
+	/* constant */
+}
 
-/* identifier */
-<INITIAL>[a-zA-Z_][a-zA-Z_0-9]*	{ }
+<INITIAL>[a-zA-Z_][a-zA-Z_0-9]*	{
+	/* identifier */
+}
 
 <INITIAL>\"	{
 	BEGIN(LSTRING);

@@ -1,5 +1,5 @@
 #ifndef ND_LIST_H
-#define ND_LIST_H
+#define DLF_LIST_H
 
 #define slist_entry(type) type *
 #define slist_construct(type) struct { \
