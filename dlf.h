@@ -1,7 +1,11 @@
 #ifndef dlf_NEEDLE_H
 #define dlf_NEEDLE_H
 
+#include <ctype.h>
+#include <inttypes.h>
+
 #include "list.h"
+#include "dlf_error.h"
 
 struct dlf_identifier;
 struct dlf_expression;
@@ -9,15 +13,16 @@ struct dlf_statement;
 struct dlf_block;
 struct dlf_value;
 
-union {
-	DFL_VALUE
-}
+enum {
+	DLF_I_FUNC,
+	DLF_I_VAR,
+};
 
 struct dlf_value {
 	int vtype;
 	union {
 		unsigned number;
-	} value;
+	};
 };
 
 struct dlf_identifier {
@@ -25,17 +30,24 @@ struct dlf_identifier {
 	int itype;
 	unsigned refcnt;
 	union {
-		struct dlf_value iconst;
+		struct dlf_value ivar;
 		struct {
 			slist_construct(struct dlf_identifier) args;
-			struct dlf_block *fb;
+			slist_construct(struct dlf_statement) statements;
 		} ifunc;
-	} ident;
+	};
 	slist_entry(struct dlf_identifier) _n;
+};
+
+enum {
+	DLF_E_CONST,
+	DLF_E_ADD,
+	DLF_E_SUB,
 };
 
 struct dlf_expression {
 	int etype;
+	uint8_t eva_complete;
 	union {
 		struct {
 			struct dlf_expression *l;
@@ -44,24 +56,36 @@ struct dlf_expression {
 		struct {
 			struct dlf_identifier *fi;
 		} function_call;
-	} expression;
+	};
 	struct dlf_value ev;
 };
+
+enum {
+	DLF_S_ASSIGN,
+	DLF_S_IDENT,
+};
+
 
 struct dlf_statement {
 	int stype;
 	unsigned line_n;
 	union {
 		struct {
-			struct dlf_identifier i;
-			struct dlf_expression e;
+			struct dlf_identifier *i;
+			struct dlf_expression *e;
 		} s_assign;
-	} statement;
-	slist_entry(struct dlf_statements) _n;
+	} ;
+	slist_entry(struct dlf_statement) _n;
 };
 
-struct dlf_block {
-	slist_construct(struct dlf_statements) statements;
+struct dlf_context {
+	slist_construct(struct dlf_statement) statements;
+	slist_construct(struct dlf_identifier) idents;
 };
+
+struct dlf_value * dlf_expression_eva (struct dlf_expression *expression);
+
+int dlf_execute (struct dlf_context *context);
+
 
 #endif

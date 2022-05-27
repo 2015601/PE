@@ -1,4 +1,4 @@
-#ifndef ND_LIST_H
+#ifndef DLF_LIST_H
 #define DLF_LIST_H
 
 #define slist_entry(type) type *
@@ -6,8 +6,11 @@
 	type *__tail; \
 	type *__head; \
 }
+
+#define slist_init(head) (head)->__tail = (head)->__head = NULL
+
 #define slist_walk(head, var, entry) \
-for (var = (head)->__head; var != NULL; var = (head)->entry)
+for (var = (head)->__head; var != NULL; var = (var)->entry)
 
 #define slist_insert_tail(head, var, entry) \
 do { \
