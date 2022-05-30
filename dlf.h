@@ -6,6 +6,7 @@
 
 #include "list.h"
 #include "dlf_error.h"
+#include "dlf_memory.h"
 
 struct dlf_identifier;
 struct dlf_expression;
@@ -87,5 +88,8 @@ struct dlf_value * dlf_expression_eva (struct dlf_expression *expression);
 
 int dlf_execute (struct dlf_context *context);
 
+// util
+struct dlf_identifier * dlf_identifier_get (const char *name);
+struct dlf_context *dlf_current_context_get ();
 
 #endif

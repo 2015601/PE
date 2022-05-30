@@ -34,7 +34,7 @@ static struct dlf_value * dlf_e_add (struct dlf_expression *expression)
 	rv = dlf_expression_eva (r);
 
 	if (!lv || !rv) {
-		dlf_error("error add expression\n");
+		dlf_error("error add expression");
 		return NULL;
 	}
 
@@ -52,7 +52,7 @@ static struct dlf_value * dlf_e_sub (struct dlf_expression *expression)
 	rv = dlf_expression_eva (r);
 
 	if (!lv || !rv) {
-		dlf_error("error sub expression\n");
+		dlf_error("error sub expression");
 		return NULL;
 	}
 
@@ -83,7 +83,7 @@ struct dlf_value * dlf_expression_eva (struct dlf_expression *expression)
 	if (v)
 		expression->eva_complete = 1;
 	else
-		dlf_error("unknown expression %d\n", expression->etype);
+		dlf_error("unknown expression %d", expression->etype);
 
 	return v;
 }
@@ -99,13 +99,13 @@ static int dlf_s_assign (struct dlf_statement *statement)
 	ident = statement->s_assign.i;
 
 	if (ident->itype != DLF_I_VAR) {
-		dlf_error("error ident type\n");
+		dlf_error("error ident type");
 		return -1;
 	}
 
 	v = dlf_expression_eva (expression);
 	if (!v) {
-		dlf_error ("error assign statement\n");
+		dlf_error ("error assign statement");
 		return -1;
 	}
 
@@ -128,7 +128,7 @@ int dlf_execute (struct dlf_context *context)
 				break;
 		}
 		if (ret != 0) {
-			dlf_error("dlf_execute error\n");
+			dlf_error("dlf_execute error");
 			return ret;
 		}
 	}
