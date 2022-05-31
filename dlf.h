@@ -15,8 +15,7 @@ struct dlf_block;
 struct dlf_value;
 
 enum {
-	DLF_I_FUNC,
-	DLF_I_VAR,
+	DLF_V_NUMBER,
 };
 
 struct dlf_value {
@@ -24,6 +23,11 @@ struct dlf_value {
 	union {
 		unsigned number;
 	};
+};
+
+enum {
+	DLF_I_FUNC,
+	DLF_I_VAR,
 };
 
 struct dlf_identifier {
@@ -90,6 +94,5 @@ int dlf_execute (struct dlf_context *context);
 
 // util
 struct dlf_identifier * dlf_identifier_get (const char *name);
-struct dlf_context *dlf_current_context_get ();
 
 #endif

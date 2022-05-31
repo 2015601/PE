@@ -135,3 +135,16 @@ int dlf_execute (struct dlf_context *context)
 	return 0;
 
 }
+
+struct dlf_identifier * dlf_identifier_get (const char *name)
+{
+	struct dlf_identifier *i;
+
+	slist_walk (&current_context->idents, i, _n) {
+		if (!strcmp (i->name, name)) {
+			return i;
+		}
+	}
+
+	return NULL;
+}
