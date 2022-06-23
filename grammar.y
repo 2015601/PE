@@ -1,8 +1,15 @@
 %{
 #include "dlf.h"
+#include "lexical.h"
 
-void dlf_statement_insert (struct dlf_statement *statement);
-static struct dlf_identifier * dlf_identifier_new (const char * name);
+static void dlf_statement_insert (struct dlf_statement *statement)
+{
+	struct dlf_context * context;
+
+	context = dlf_current_context_get();
+
+	slist_insert_tail (&context->statements, statement, _n);
+}
 
 static struct dlf_expression * dlf_binary_expression_calloc (int type,
 	struct dlf_expression *l, struct dlf_expression *r)
@@ -13,23 +20,37 @@ static struct dlf_expression * dlf_binary_expression_calloc (int type,
 	e->binary.r = r;
 }
 
-static struct dlf_identifier_new (const char *name)
+static struct dlf_identifier *  dlf_identifier_new (const char *name, int type)
 {
 	struct dlf_identifier *i;
+	struct dlf_context *context;
 
 	i = dlf_identifier_get (name);
 	if (i) {
 		return i;
 	}
-	
+
+	context = dlf_current_context_get();
+
+	i = dlf_calloc(sizeof (struct dlf_identifier), 1);
+	i->itype = type;
+	i->name = strdup (name);
+
+	slist_insert_tail(&context->idents, i, _n);
+
+	return i;
 }
 
+static void yyerror(const char * error) {
+
+}
 
 %}
 
 %union {
 	struct dlf_statement *s;
 	struct dlf_expression *e;
+	char * id;
 	int number;
 }
 
@@ -37,27 +58,19 @@ static struct dlf_identifier_new (const char *name)
 %token FUNCTION IF ELIF ELSE WHILE FOR RETURN EQUAL
 %token FALSE TRUE
 %token <number> NUMBER
-%token IDENTIFIER STRING
-%type BLOCK
-%type STATEMENT
-%type STATEMENTS
+%token <id> IDENTIFIER
 %type <s> ASSIGN_STATEMENT
-%type IDENTIFIER_STATEMENT
-%type EXPRESSION
-%type <e> ADD_EXPRESSION SUB_EXPRESSION
+%type <e> EXPRESSION BINARY_EXPRESSION
 %left ADD SUB
 
 %%
 
 STATEMENTS : /* empty */
-	|	STATEMENTS STATEMENT { dlf_statement_insert($2); }
+	|	STATEMENTS ASSIGN_STATEMENT { dlf_statement_insert($2); }
 	;
 
-STATEMENT : ASSIGN_STATEMENT
-	;
-
-ASSIGN_STATEMENT :	IDENTIFIER EQUAL EXPRESSION {
-		struct dlf_identifier *i = dlf_identifier_new ($1);
+ASSIGN_STATEMENT : IDENTIFIER EQUAL EXPRESSION {
+		struct dlf_identifier *i = dlf_identifier_new ($1, DLF_I_VAR);
 		$$ = dlf_calloc (sizeof(struct dlf_statement), 1);
 		$$->stype = DLF_S_ASSIGN;
 		$$->s_assign.i = i;

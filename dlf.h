@@ -2,6 +2,7 @@
 #define dlf_NEEDLE_H
 
 #include <ctype.h>
+#include <stdio.h>
 #include <inttypes.h>
 
 #include "list.h"
@@ -94,5 +95,20 @@ int dlf_execute (struct dlf_context *context);
 
 // util
 struct dlf_identifier * dlf_identifier_get (const char *name);
+
+struct dlf_context * dlf_current_context_get(void);
+
+struct dlf_file {
+	const char *file_name;
+	FILE *file;
+	unsigned offset;
+};
+
+extern struct dlf_file *current_script_file;
+
+#define DLF_FILESET(file) current_script_file=file
+#define DLFFILE current_script_file
+
+struct dlf_file * dlf_file_create (const char *filename);
 
 #endif

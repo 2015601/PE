@@ -10,7 +10,7 @@ static inline void * dlf_calloc(size_t ele_size, unsigned eles)
 
 	p = calloc(ele_size, eles);
 	if (!p) {
-		dlf_error("calloc error, size = %d", ele_size * eles);
+		dlf_error("calloc error, size = %lu", ele_size * eles);
 	}
 
 	return p;
@@ -22,7 +22,7 @@ static inline void * dlf_alloc(size_t size)
 
 	p = malloc (size);
 	if (!p) {
-		dlf_error ("alloc error, size = %d");
+		dlf_error ("alloc error, size = %lu", size);
 	}
 
 	return p;

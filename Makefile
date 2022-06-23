@@ -1,6 +1,6 @@
 # dlf
 
-SRC= dlf.c lexical.c grammar.c
+SRC= dlf.c lexical.c grammar.c main.c
 OBJ+= $(patsubst %.c,%.o,${SRC})
 
 dlf: ${OBJ}

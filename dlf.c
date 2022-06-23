@@ -1,8 +1,11 @@
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "dlf.h"
 
 static struct dlf_context *current_context;
+struct dlf_file *current_script_file;
 
 static struct dlf_identifier * dlf_i_lookup (const char *name)
 {
@@ -147,4 +150,32 @@ struct dlf_identifier * dlf_identifier_get (const char *name)
 	}
 
 	return NULL;
+}
+
+struct dlf_context * dlf_current_context_get(void)
+{
+	return current_context;
+}
+
+struct dlf_file * dlf_file_create (const char *filename)
+{
+	struct dlf_file *file;
+
+	file = dlf_calloc(sizeof (struct dlf_file), 1);
+
+	file->file = fopen (filename, "r");
+	if (!file->file) {
+		dlf_log("open file %s error", filename);
+		goto err;
+	}
+
+	file->file_name = filename;
+
+	return file;
+
+err:
+	if (file->file) {
+		fclose(file->file);
+	}
+	dlf_free(file);
 }

@@ -1,6 +1,11 @@
 %{
-
+#include "dlf.h"
+#include "grammar.h"
 #undef YY_INPUT
+
+#define YY_INPUT(buf, result, max_size) \
+	result = fread(buf, 1, max_size, DLFFILE->file)
+
 %}
 
 %option noyywrap
@@ -14,7 +19,7 @@
 <INITIAL>"else"	return ELSE;
 <INITIAL>"while"	return WHILE;
 <INITIAL>"for"	return FOR;
-<INITIAL>"return"	return RETUEN;
+<INITIAL>"return"	return RETURN;
 <INITIAL>";"	return SEMICOLON;
 <INITIAL>"="	return EQ;
 <INITIAL>","	return COMMA;
@@ -40,9 +45,6 @@
 	BEGIN(0);
 }
 <LSTRING>\\\"	{ }
-<LSTRING>\\\"	{ }
 <LSTRING>\\n	{ }
 <LSTRING>\\t	{ }
 <LSTRING>\\\\	{ }
-
-%%
