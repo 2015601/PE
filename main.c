@@ -4,10 +4,12 @@
 
 int main (int argc, char *argv[])
 {
+	struct dlf_file *file;
 
-	DLF_FILESET(dlf_file_create(argv[1]));
+	file = dlf_file_create(argv[1]);
+	DLF_SCRIPT_LOAD(file);
 
-	yyparse();
+	dlf_execute(file->context);
 
 	return 0;
 }

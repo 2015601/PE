@@ -1,17 +1,17 @@
 # dlf
 
-SRC= dlf.c lexical.c grammar.c main.c
+SRC= dlf.c lexical.c grammar.c main.c cfunction.c
 OBJ+= $(patsubst %.c,%.o,${SRC})
 
 dlf: ${OBJ}
 	$(CC) -o dlf $^
 
 ${OBJ}: %.o: %.c
-	$(CC) -c -o $@ $<
+	$(CC) -c -g -O0 -o $@ $<
 
 ${SRC}:
 	flex -B8 -o lexical.c --header-file=lexical.h lexical.l
-	bison -l -o grammar.c --defines=grammar.h grammar.y
+	bison -l -t -v -o grammar.c --defines=grammar.h grammar.y
 
 .PHONY : clean
 

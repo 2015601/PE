@@ -34,7 +34,7 @@
 # define YY_YY_GRAMMAR_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -63,9 +63,10 @@ extern int yydebug;
     FALSE = 273,
     TRUE = 274,
     NUMBER = 275,
-    IDENTIFIER = 276,
-    ADD = 277,
-    SUB = 278
+    STRING = 276,
+    IDENTIFIER = 277,
+    ADD = 278,
+    SUB = 279
   };
 #endif
 
@@ -78,7 +79,10 @@ union YYSTYPE
 
 	struct dlf_statement *s;
 	struct dlf_expression *e;
+	struct dlf_value args[MAX_ARG_COUNT];
+	struct dlf_value v;
 	char * id;
+	const char *string;
 	int number;
 
 

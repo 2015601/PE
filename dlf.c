@@ -4,8 +4,8 @@
 
 #include "dlf.h"
 
-static struct dlf_context *current_context;
 struct dlf_file *current_script_file;
+static struct dlf_context *current_context;
 
 static struct dlf_identifier * dlf_i_lookup (const char *name)
 {
@@ -77,10 +77,13 @@ struct dlf_value * dlf_expression_eva (struct dlf_expression *expression)
 	switch (expression->etype) {
 		case DLF_E_ADD:
 			v = dlf_e_add(expression);
+			break;
 		case DLF_E_SUB:
 			v = dlf_e_sub (expression);
+			break;
 		case DLF_E_CONST:
 			v = dlf_e_const(expression);
+			break;
 	}
 
 	if (v)
@@ -117,6 +120,22 @@ static int dlf_s_assign (struct dlf_statement *statement)
 	return 0;
 }
 
+static int dlf_s_funcall(struct dlf_statement *statement)
+{
+	struct dlf_identifier *ident;
+
+	ident = statement->s_func.fi;
+
+	if (ident->itype != DLF_I_FUNC) {
+		dlf_error("error func type");
+		return -1;
+	}
+
+	ident->ivar = ident->func.func_call (statement->s_func.args);
+
+	return 0;
+}
+
 int dlf_execute (struct dlf_context *context)
 {
 	struct dlf_statement *statement;
@@ -128,6 +147,9 @@ int dlf_execute (struct dlf_context *context)
 		switch (statement->stype) {
 			case DLF_S_ASSIGN :
 				ret = dlf_s_assign (statement);
+				break;
+			case DLF_S_FUNCALL:
+				ret = dlf_s_funcall(statement);
 				break;
 		}
 		if (ret != 0) {
@@ -152,11 +174,6 @@ struct dlf_identifier * dlf_identifier_get (const char *name)
 	return NULL;
 }
 
-struct dlf_context * dlf_current_context_get(void)
-{
-	return current_context;
-}
-
 struct dlf_file * dlf_file_create (const char *filename)
 {
 	struct dlf_file *file;
@@ -171,6 +188,9 @@ struct dlf_file * dlf_file_create (const char *filename)
 
 	file->file_name = filename;
 
+	file->context = dlf_calloc(sizeof(struct dlf_context), 1);
+	current_context = file->context;
+
 	return file;
 
 err:
@@ -178,4 +198,36 @@ err:
 		fclose(file->file);
 	}
 	dlf_free(file);
+}
+
+
+struct dlf_identifier *  dlf_identifier_new (const char *name, int type)
+{
+	struct dlf_identifier *i;
+	struct dlf_context *context;
+
+	i = dlf_identifier_get (name);
+	if (i) {
+		return i;
+	}
+
+	context = current_script_file->context;
+
+	i = dlf_calloc(sizeof (struct dlf_identifier), 1);
+	i->itype = type;
+	i->name = strdup (name);
+
+	slist_insert_tail(&context->idents, i, _n);
+
+	return i;
+}
+
+struct dlf_value *dlf_value_new(int type)
+{
+	struct dlf_value *value = dlf_calloc(1, sizeof(struct dlf_value));
+
+	value->vtype = type;
+
+
+	return value;
 }
