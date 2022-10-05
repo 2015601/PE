@@ -42,7 +42,11 @@ static int string_length;
 
 <INITIAL>[a-zA-Z_][a-zA-Z_0-9]*	{
 	/* identifier */
-	yylval.id = strdup(yytext);
+	struct dlf_identifier *i = dlf_identifier_new (yytext, DLF_I_VAR);
+	if (!i) {
+		dlf_panic("new identifier error");
+	}
+	yylval.i = i;
 	return IDENTIFIER;
 }
 

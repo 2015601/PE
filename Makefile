@@ -1,6 +1,6 @@
 # dlf
 
-SRC= dlf.c lexical.c grammar.c main.c cfunction.c
+SRC= dlf.c lexical.c grammar.c main.c cfunction.c dlf_object.c
 OBJ+= $(patsubst %.c,%.o,${SRC})
 
 dlf: ${OBJ}
@@ -16,4 +16,4 @@ ${SRC}:
 .PHONY : clean
 
 clean:
-	rm -rf *.o dlf lexical.c grammar.c lexical.h grammar.h
+	rm -rf *.o dlf lexical.c grammar.c lexical.h grammar.h grammar.tab.c grammar.output

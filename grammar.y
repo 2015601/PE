@@ -39,7 +39,7 @@ static int current_func_call_arg_cnt;
 	struct dlf_expression *e;
 	struct dlf_value args[MAX_ARG_COUNT];
 	struct dlf_value v;
-	char * id;
+	struct dlf_identifier *i;
 	const char *string;
 	int number;
 }
@@ -49,7 +49,7 @@ static int current_func_call_arg_cnt;
 %token FALSE TRUE
 %token <number> NUMBER
 %token <string> STRING
-%token <id> IDENTIFIER
+%token <i> IDENTIFIER
 %type <args> ARGS FUNC_ARG
 %type <v> ARG
 %type <s> ASSIGN_STATEMENT FUN_CALL
@@ -64,10 +64,14 @@ STATEMENTS : /* empty */
 	;
 
 ASSIGN_STATEMENT : IDENTIFIER EQUAL EXPRESSION {
-		struct dlf_identifier *i = dlf_identifier_new ($1, DLF_I_VAR);
+		if ($1->itype == DLF_I_NIL) {
+			$1->itype = DLF_I_VAR;
+		} else if ($1->itype != DLF_I_VAR) {
+			dlf_panic("error statement, var cant assign");
+		}
 		$$ = dlf_calloc (sizeof(struct dlf_statement), 1);
 		$$->stype = DLF_S_ASSIGN;
-		$$->s_assign.i = i;
+		$$->s_assign.i = $1;
 		$$->s_assign.e = $3;
 	}
 	;
@@ -90,19 +94,20 @@ BINARY_EXPRESSION : NUMBER {
 	;
 
 FUN_CALL : IDENTIFIER LP FUNC_ARG RP {
-		struct dlf_identifier *i = dlf_identifier_get ($1);
-		if (!i || i->itype != DLF_I_FUNC) {
-			dlf_panic("error function call");
+		if ($1->itype != DLF_I_FUNC) {
+			dlf_panic("var is not func");
 		}
 		$$ = dlf_calloc (sizeof(struct dlf_statement), 1);
 		$$->stype = DLF_S_FUNCALL;
-		$$->s_func.fi = i;
+		$$->s_func.fi = $1;
+		$$->s_func.arg_count = current_func_call_arg_cnt;
+		current_func_call_arg_cnt = 0;
 		memcpy($$->s_func.args, $3, sizeof($3));
 	}
 	;
 
 FUNC_ARG: /* empty */ { memset($$, 0, sizeof($$)); }
-	| ARGS { (void*)0; current_func_call_arg_cnt = 0; }
+	| ARGS { (void*)0; }
 	;
 
 ARGS : ARG {
@@ -123,6 +128,10 @@ ARG : NUMBER {
 	| STRING {
 		$$.vtype = DLF_V_STRING;
 		$$.str = strdup($1) ;
+	}
+	| IDENTIFIER {
+		$$.vtype = DLF_V_VAR;
+		$$.id = $1;
 	}
 	;
 
